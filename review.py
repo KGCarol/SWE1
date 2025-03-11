@@ -31,24 +31,16 @@ PyObjectId = Annotated[str, BeforeValidator(str)]
 async def root():
     return {"message": "Hello World"}
 
-class Review(BaseModel):
-    id: Optional[str] = Field(default=None, alias="_id", description="Unique review ID")
+class ReviewModel(BaseModel):
+    id: Optional[PyObjectId] = Field(default = None, alias="_id", description="Unique review ID")
     book_id:str = Field(..., description="ID of the book being reviewed")
     rating:int = Field(..., ge=1, le=5, description="Rating of whole numbers between 1-5")
     comment: Optional[str] = Field(None, description="An optional comment that can be made by users")
-
-    @model_validator(mode='before')
-    def set_id(cls, values):
-        if "_id" not in values:  # If _id is not provided
-            values["_id"] = str(ObjectId())  # Generate a new ObjectId
-        return values
-
-model_config = ConfigDict(
+    model_config = ConfigDict(
         populate_by_name=True,
         arbitrary_types_allowed=True,
         json_schema_extra={
             "example": {
-                "_id": str(ObjectId),
                 "book_id": "abc123",
                 "rating": 5,
                 "comment": "Awesome book!",
@@ -57,17 +49,14 @@ model_config = ConfigDict(
     )
 
     #Create a new review
-@app.post("/reviews/", response_model=Review)
-async def create_review(review : Review):
-    review_dict = review.model_dump()
-    result = await db.reviews.insert_one(review_dict)
-    if result.inserted_id:
-        created_review = await db.reviews.find_one({"_id": result.inserted_id})
-        return created_review
-    raise HTTPException(status_code=500, detail="Review could not be saved")
+@app.post("/reviews/", response_model=ReviewModel, response_description="Create new review")
+async def create_review(review : ReviewModel = Body(...)):
+    new_review = await db.reviews.insert_one(review.model_dump(by_alias=True, exclude=["id"]))
+    created_review = await db.reviews.find_one({"_id": new_review.inserted_id})
+    return created_review
 
     #Get reviews for a specific book
-@app.get("/reviews/{book_id}", response_model=list[Review])
+@app.get("/reviews/{book_id}", response_model=list[ReviewModel])
 async def get_reviews(book_id : str):
     if ObjectId.is_valid(book_id):
         book_id = ObjectId(book_id)
@@ -76,7 +65,7 @@ async def get_reviews(book_id : str):
 
     #Edit an existing review
 @app.put("/reviews/{review_id}")
-async def update_review(review_id: str, review: Review):
+async def update_review(review_id: str, review: ReviewModel):
     if not ObjectId.is_valid(review_id):
         raise HTTPException(status_code=400, detail="Invalid review ID format")
     result = await db.reviews.update_one({"_id": ObjectId(review_id)},
