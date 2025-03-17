@@ -1,13 +1,9 @@
 from typing import Annotated, Optional
 
-import pymongo
 from bson import ObjectId
 from fastapi import FastAPI, Body, HTTPException
-from pydantic import BaseModel, BeforeValidator, Field, ConfigDict, model_validator
-from pydantic_core.core_schema import json_schema
-from pymongo.server_api import ServerApi
+from pydantic import BaseModel, BeforeValidator, Field, ConfigDict
 import motor.motor_asyncio
-import pydantic
 
 
 #path to the DB
