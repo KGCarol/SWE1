@@ -55,6 +55,24 @@ async def create_review(review : ReviewModel = Body(...)):
     created_review = await db.reviews.find_one({"_id": new_review.inserted_id})
     return created_review
 
+    # Get all reviews
+@app.get("/reviews/", response_model=list[ReviewModel])
+async def get_all_reviews():
+    reviews = await db.reviews.find().to_list()
+    return reviews
+
+    # Get a specific review
+@app.get("/reviews/id/{review_id}", response_model=ReviewModel)
+async def get_a_review(review_id: str):
+    if not ObjectId.is_valid(review_id):
+        raise HTTPException(status_code=400, detail="Invalid review ID format")
+
+    review = await db.reviews.find_one({"_id": ObjectId(review_id)})
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+
+    return review
+
     #Get reviews for a specific book
 @app.get("/reviews/{book_id}", response_model=list[ReviewModel])
 async def get_reviews(book_id : str):
