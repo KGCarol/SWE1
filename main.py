@@ -29,6 +29,11 @@ class UserUpdate(BaseModel):
 #Initialize FastAPI
 app = FastAPI()
 
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the FastAPI MongoDB API! This is the profile-management branch ;)"}
+
+
 @app.post("/users/", response_model=None)
 def create_user(user: User):
     db.users.insert_one(user.dict())
