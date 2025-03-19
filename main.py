@@ -31,7 +31,7 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the FastAPI MongoDB API! This is the profile-management branch :)"}
+    return {"message": "Welcome to the FastAPI MongoDB API! This is the profile-management branch ;)"}
 
 
 @app.post("/users/", response_model=None)
