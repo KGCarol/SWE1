@@ -29,6 +29,7 @@ class UserUpdate(BaseModel):
 
 #Initialize FastAPI
 app = FastAPI()
+app.include_router(wishlist_router)
 
 @app.get("/")
 def read_root():
