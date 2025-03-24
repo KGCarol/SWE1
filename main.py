@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional
+from app.wishlist import router as wishlist_router
 
 #MongoDB configuration
 client = MongoClient("mongodb://localhost:27017/")
