@@ -20,9 +20,6 @@ db = client.mydatabase
 collection = db.users
 carts_collection = db.shopping_carts
 
-class User(BaseModel):
-    username: str
-
 #current place holder of mine for book to add in shopping cart
 class CartItem(BaseModel):
     item_id: str  
