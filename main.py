@@ -2,7 +2,8 @@ from pymongo import MongoClient
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional
-from app.wishlist import router as wishlist_router
+from wishlist import router as wishlist_router
+from shopping_cart import router as shopping_cart_router
 
 #MongoDB configuration
 client = MongoClient("mongodb://localhost:27017/")
@@ -30,6 +31,7 @@ class UserUpdate(BaseModel):
 #Initialize FastAPI
 app = FastAPI()
 app.include_router(wishlist_router)
+app.include_router(shopping_cart_router)
 
 @app.get("/")
 def read_root():
